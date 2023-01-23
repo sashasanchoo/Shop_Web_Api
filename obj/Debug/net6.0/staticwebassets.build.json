@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "Hash": "UBvzEepfK/O5mZQPY45Agpr1ABG3LOVtTkzdG3P5ODw=",
+  "Source": "IShop",
+  "BasePath": "_content/IShop",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "IShop\\wwwroot",
+      "Source": "IShop",
+      "ContentRoot": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\",
+      "BasePath": "_content/IShop",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\Categories.html",
+      "SourceId": "IShop",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\",
+      "BasePath": "_content/IShop",
+      "RelativePath": "Categories.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Categories.html"
+    },
+    {
+      "Identity": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\Login.html",
+      "SourceId": "IShop",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\",
+      "BasePath": "_content/IShop",
+      "RelativePath": "Login.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Login.html"
+    },
+    {
+      "Identity": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\Register.html",
+      "SourceId": "IShop",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Користувач\\source\\repos\\RestApiDemo\\IShop\\wwwroot\\",
+      "BasePath": "_content/IShop",
+      "RelativePath": "Register.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Register.html"
+    }
+  ]
+}
