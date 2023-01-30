@@ -10,10 +10,11 @@ using IShop.Model;
 using IShop.Filter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace IShop.Controllers
 {
-    [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}, ApiKey", Roles = "Admin")]
+    [EnableCors("MyClient", PolicyName = "MyClient")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
@@ -79,6 +80,7 @@ namespace IShop.Controllers
 
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
