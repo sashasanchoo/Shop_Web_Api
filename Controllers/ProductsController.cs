@@ -10,10 +10,11 @@ using IShop.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace IShop.Controllers
 {
-    [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}, ApiKey", Roles = "Admin")]
+    [EnableCors("MyClient", PolicyName = "MyClient")]
     [Route("api/[controller]")]//route prefix
     [ApiController]
     public class ProductsController : ControllerBase
@@ -26,30 +27,30 @@ namespace IShop.Controllers
         }
 
         // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
+        [HttpGet("{categoryName:alpha?}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string categoryName = "")
         {
-            return await _context.Product.ToListAsync();
+            var result = string.IsNullOrEmpty(categoryName) ? await _context.Product.ToListAsync() : await _context.Product.Where(p => p.Category.Name == categoryName).ToListAsync();
+            return Ok(new { products = result, categories = await _context.Category.ToListAsync() });
         }
 
         // GET: api/Products/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-
+            var product = await _context.Product.Include(nameof(Product.Category)).FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
-
             return product;
         }
         // GET: api/Products/Find/name
         [HttpGet("Find/{productName:alpha}")]
+        //[HttpGet("Find")]
         public async Task<ActionResult<Product>> FindProductByName(string productName)
         {
-            var product = await _context.Product.FirstOrDefaultAsync(p => p.Name == productName);
+            var product = await _context.Product.Include(nameof(Product.Category)).FirstOrDefaultAsync(p => p.Name == productName);
 
             if (product == null)
             {
@@ -61,6 +62,7 @@ namespace IShop.Controllers
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, Product product)
         {
@@ -92,6 +94,7 @@ namespace IShop.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
@@ -102,6 +105,7 @@ namespace IShop.Controllers
         }
 
         // DELETE: api/Products/5
+        [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
