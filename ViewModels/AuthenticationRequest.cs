@@ -1,11 +1,11 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace IShop.Model
+namespace IShop.ViewModels
 {
     public class AuthenticationRequest
     {
         [Required]
-        public string Username { get; set; }
+        public string EmailAddress { get; set; }
         [Required]
         public string Password { get; set; }
     }

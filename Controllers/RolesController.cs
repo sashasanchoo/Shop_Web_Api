@@ -11,7 +11,6 @@ using System.Data;
 namespace IShop.Controllers
 {
     [EnableCors("MyClient", PolicyName = "MyClient")]
-    //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController : ControllerBase
@@ -46,7 +45,7 @@ namespace IShop.Controllers
         // DELETE: api/Categories/5
         [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}", Roles = "Admin")]
         [HttpDelete("{roleName:alpha}")]
-        public async Task<IActionResult> DeleteCategory(string roleName)
+        public async Task<IActionResult> DeleteRole(string roleName)
         {
             var role = await _roleManager.FindByNameAsync(roleName);
             if (role == null)

@@ -23,8 +23,6 @@ namespace IShop.Controllers
             _userManager = userManager;
             _jwtService = jwtService;
         }
-        // GET: api/Users
-        //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}, ApiKey", Roles = "Admin")]
         [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
         [HttpGet]
         public async Task<ActionResult> GetUser()
@@ -37,8 +35,8 @@ namespace IShop.Controllers
             return Ok(new { user.UserName });
         }
         // POST: api/Users
+        //Register
         [HttpPost]
-        //it is registration function
         public async Task<ActionResult<User>> PostUser(User user)
         {
             if (!ModelState.IsValid)
@@ -82,8 +80,8 @@ namespace IShop.Controllers
         }
 
         // POST: api/Users/BearerToken
+        //Login
         [HttpPost("BearerToken")]
-        //it is login function
         public async Task<ActionResult<AuthenticationResponse>> CreateBearerToken(AuthenticationRequest request)
         {
             if (!ModelState.IsValid)
@@ -106,6 +104,5 @@ namespace IShop.Controllers
             var token = _jwtService.CreateToken(user, roles);
             return Ok(token);
         }
-        //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
     }
 }

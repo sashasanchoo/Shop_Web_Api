@@ -1,4 +1,4 @@
-﻿namespace IShop.Model
+﻿namespace IShop.ViewModels
 {
     public class AuthenticationResponse
     {

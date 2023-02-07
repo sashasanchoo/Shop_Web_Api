@@ -4,6 +4,7 @@ using IShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IShop.Migrations
 {
     [DbContext(typeof(IShopContext))]
-    partial class IShopContextModelSnapshot : ModelSnapshot
+    [Migration("20230204110813_changeUserIdDataTypeCommentModel")]
+    partial class changeUserIdDataTypeCommentModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,13 +61,15 @@ namespace IShop.Migrations
                     b.Property<DateTime>("Published")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comment");
                 });
@@ -314,7 +318,15 @@ namespace IShop.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("IShop.Model.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IShop.Model.Product", b =>
@@ -385,6 +397,11 @@ namespace IShop.Migrations
                 });
 
             modelBuilder.Entity("IShop.Model.Product", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("IShop.Model.User", b =>
                 {
                     b.Navigation("Comments");
                 });

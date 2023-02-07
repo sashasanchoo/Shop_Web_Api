@@ -10,25 +10,33 @@ using IShop.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using IShop.Authentication.ApiKey;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IShopContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IShopContext") ?? throw new InvalidOperationException("Connection string 'IShopContext' not found.")));
 
-// Add services to the container.
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 builder.Services.AddIdentityCore<User>(
-    options => 
-    { 
+    options =>
+    {
         options.SignIn.RequireConfirmedAccount = false;
         options.User.RequireUniqueEmail = true;
     }).
     AddRoles<IdentityRole>().
     AddEntityFrameworkStores<IShopContext>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+}).AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+builder.Services.AddSingleton(bot => new BotSender(
+    builder.Configuration["BotSender:Token"],
+    builder.Configuration.GetValue<long>("BotSender:ChatId")));
+builder.Services.AddTransient(sender => new MailSender(
+    builder.Configuration["MailSender:Host"],
+    builder.Configuration.GetValue<int>("MailSender:Port"),
+    builder.Configuration.GetValue<bool>("MailSender:EnableSSL"),
+    builder.Configuration["MailSender:UserName"],
+    builder.Configuration["MailSender:Password"]));
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -42,9 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
-}).AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", options => { });
-builder.Services.AddScoped<ApiKeyService>();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -63,28 +69,9 @@ builder.Services.AddSwaggerGen(options =>
         }
     };
     options.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-    var apiKeySecurityScheme = new OpenApiSecurityScheme
-    {
-        BearerFormat = "ApiKey",
-        Name = "Api-Key",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "ApiKey",
-        Description = "Put **_ONLY_** your ApiKey token on textbox below",
-        Reference = new OpenApiReference
-        {
-            Id = "ApiKey",
-            Type = ReferenceType.SecurityScheme
-        }
-    };
-    options.AddSecurityDefinition(apiKeySecurityScheme.Reference.Id, apiKeySecurityScheme);
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {jwtSecurityScheme, Array.Empty<string>() }
-    });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {apiKeySecurityScheme, Array.Empty<string>() }
     });
 }
 );
@@ -93,7 +80,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy("MyClient", policy =>
     {
         policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
-        //policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 
