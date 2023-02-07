@@ -20,6 +20,6 @@ namespace IShop.Data
 
         public DbSet<Product> Product { get; set; }
 
-        public DbSet<UserApiKey> UserApiKeys { get; set; }
+        public DbSet<Comment> Comment { get; set; }
     }
 }

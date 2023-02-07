@@ -1,6 +1,7 @@
 ﻿using IShop.Data;
 using IShop.Model;
 using IShop.Services;
+using IShop.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -17,12 +18,10 @@ namespace IShop.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly JwtService _jwtService;
-        private readonly ApiKeyService _apiKeyService;
-        public UsersController(UserManager<User> userManager, JwtService jwtService, ApiKeyService apiKeyService)
+        public UsersController(UserManager<User> userManager, JwtService jwtService)
         {
             _userManager = userManager;
             _jwtService = jwtService;
-            _apiKeyService = apiKeyService;
         }
         // GET: api/Users
         //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}, ApiKey", Roles = "Admin")]
@@ -31,23 +30,23 @@ namespace IShop.Controllers
         public async Task<ActionResult> GetUser()
         {
             User user = await _userManager.FindByNameAsync(User.Identity?.Name);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
-            return Ok(new {user.UserName});
+            return Ok(new { user.UserName });
         }
         // POST: api/Users
         [HttpPost]
         //it is registration function
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var result = await _userManager.CreateAsync(user, user.Password);
-            if (!result.Succeeded) 
+            if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }
@@ -59,7 +58,7 @@ namespace IShop.Controllers
         // POST: api/Users/ChangePassword
         [Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
         [HttpPost("ChangePassword")]
-        public async Task<ActionResult> ChangePassword([FromBody]ChangePasswordRequest request)
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -71,7 +70,7 @@ namespace IShop.Controllers
                 return BadRequest("User not found");
             }
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
-            if(!changePasswordResult.Succeeded)
+            if (!changePasswordResult.Succeeded)
             {
                 foreach (var error in changePasswordResult.Errors)
                 {
@@ -87,46 +86,24 @@ namespace IShop.Controllers
         //it is login function
         public async Task<ActionResult<AuthenticationResponse>> CreateBearerToken(AuthenticationRequest request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest("Bad credentials");
             }
             var user = await _userManager.FindByEmailAsync(request.EmailAddress);
 
             //var user = await _userManager.FindByNameAsync(request.EmailAddress);
-            if(user == null)
-            {
-                return BadRequest("User not found");
-            }
-            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-            if(!isPasswordValid)
-            {
-                return BadRequest("Wrong password");
-            }
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = _jwtService.CreateToken(user, roles);
-            return Ok(token);
-        }
-        // POST: api/Users/ApiKey
-        [HttpPost("ApiKey")]
-        public async Task<ActionResult> CreateApiKey(AuthenticationRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var user = await _userManager.FindByEmailAsync(request.EmailAddress);
-            //var user = await _userManager.FindByNameAsync(request.EmailAddress);
             if (user == null)
             {
                 return BadRequest("User not found");
             }
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
-            if(!isPasswordValid)
+            if (!isPasswordValid)
             {
                 return BadRequest("Wrong password");
             }
-            var token = await _apiKeyService.CreateApiKey(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtService.CreateToken(user, roles);
             return Ok(token);
         }
         //[Authorize(AuthenticationSchemes = $"{JwtBearerDefaults.AuthenticationScheme}")]
