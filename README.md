@@ -1,5 +1,5 @@
 # Shop web API
 
-## Install depencies
+## Install Dependencies `run ...`
 
 ... todo implement how to run the app
